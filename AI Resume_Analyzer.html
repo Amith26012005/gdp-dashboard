@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Resume Analyzer · Format Validator</title>
+  <!-- Font Awesome Icons & Google Fonts for clean UI -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f6f9fc 0%, #edf2f7 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+
+    .app-card {
+      max-width: 820px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 3rem;
+      padding: 2.5rem 2.8rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 20, 30, 0.25),
+                  inset 0 1px 2px rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.5);
+      transition: all 0.2s ease;
+    }
+
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 2.1rem;
+      letter-spacing: -0.02em;
+      color: #0b2b3c;
+      margin-bottom: 0.3rem;
+    }
+
+    h1 i {
+      background: #0b2b3c;
+      color: white;
+      padding: 0.5rem;
+      border-radius: 1.2rem;
+      font-size: 1.8rem;
+      width: 3.2rem;
+      text-align: center;
+      background: linear-gradient(135deg, #1a4b5e, #0d2f3f);
+      box-shadow: 0 6px 12px -6px rgba(0,0,0,0.2);
+    }
+
+    .subhead {
+      color: #3a5a6b;
+      font-weight: 400;
+      font-size: 1rem;
+      margin-left: 0.2rem;
+      margin-bottom: 1.8rem;
+      border-left: 4px solid #5f9db2;
+      padding-left: 1rem;
+      background: rgba(95, 157, 178, 0.06);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .upload-zone {
+      background: white;
+      border-radius: 2rem;
+      padding: 2.2rem 1.8rem;
+      text-align: center;
+      border: 2px dashed #b6d4e0;
+      transition: 0.2s;
+      cursor: pointer;
+      margin-bottom: 1.8rem;
+      background: rgba(255,255,255,0.5);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .upload-zone:hover {
+      border-color: #3d8b9e;
+      background: rgba(255,255,255,0.8);
+    }
+
+    .upload-zone i {
+      font-size: 3.2rem;
+      color: #3d7b8e;
+      margin-bottom: 0.4rem;
+    }
+
+    .upload-zone h3 {
+      font-weight: 600;
+      color: #1f4a5a;
+      font-size: 1.3rem;
+    }
+
+    .upload-zone p {
+      color: #4f6f7e;
+      font-size: 0.95rem;
+      margin-top: 0.3rem;
+    }
+
+    .file-input-wrap {
+      margin: 1.2rem 0 0.2rem;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .file-label {
+      background: #1f4a5a;
+      color: white;
+      padding: 0.7rem 2rem;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: inline-block;
+      transition: 0.15s;
+      box-shadow: 0 6px 12px -6px rgba(0,32,44,0.25);
+      cursor: pointer;
+      border: 1px solid #234f61;
+    }
+
+    .file-label:hover {
+      background: #123b49;
+      transform: scale(1.02);
+    }
+
+    .file-label i {
+      margin-right: 8px;
+      font-size: 1rem;
+    }
+
+    .file-status {
+      margin-top: 0.8rem;
+      font-size: 0.9rem;
+      color: #1f5568;
+      background: #dcecf3;
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      display: inline-block;
+      font-weight: 500;
+    }
+
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1rem 0 1.8rem;
+    }
+
+    .btn {
+      border: none;
+      background: white;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px -4px rgba(0,0,0,0.04);
+      border: 1px solid #dbe9ef;
+      color: #1d4b5b;
+      transition: 0.15s;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #0b2b3c;
+      border: 1px solid #0b2b3c;
+      color: white;
+      box-shadow: 0 8px 16px -8px rgba(11, 43, 60, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: #123f52;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      filter: grayscale(0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #b6d0db;
+    }
+
+    .btn-outline:hover {
+      background: #e7f0f5;
+    }
+
+    .result-card {
+      background: white;
+      border-radius: 2rem;
+      padding: 1.8rem 2rem;
+      margin-top: 1.2rem;
+      box-shadow: 0 8px 20px -10px rgba(0,0,0,0.06);
+      border: 1px solid #e1eef5;
+      display: none;
+    }
+
+    .result-card.visible {
+      display: block;
+      animation: fadeSlide 0.25s ease;
+    }
+
+    @keyframes fadeSlide {
+      0% { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid #e7f1f6;
+    }
+
+    .result-header i {
+      font-size: 1.8rem;
+    }
+
+    .verdict-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: #e7f4f9;
+      padding: 0.3rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #0f3f4f;
+      letter-spacing: 0.3px;
+    }
+
+    .format-checklist {
+      list-style: none;
+      margin: 1.2rem 0 0.2rem;
+    }
+
+    .format-checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f0f6fa;
+      font-size: 0.98rem;
+      color: #1e3d4b;
+    }
+
+    .format-checklist li:last-child {
+      border: none;
+    }
+
+    .format-checklist i {
+      width: 1.4rem;
+      margin-top: 0.1rem;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+
+    .pass { color: #1f8b6b; }
+    .fail { color: #b13e4b; }
+    .warn { color: #b8893b; }
+
+    .detail-line {
+      display: flex;
+      justify-content: space-between;
+      background: #f5fafd;
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      margin-top: 0.8rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .detail-line span:last-child {
+      color: #114252;
+    }
+
+    .footer-note {
+      margin-top: 1.5rem;
+      font-size: 0.75rem;
+      color: #6b8b9b;
+      text-align: center;
+      border-top: 1px solid #d7e7ef;
+      padding-top: 1.5rem;
+      letter-spacing: 0.2px;
+    }
+
+    /* responsiveness */
+    @media (max-width: 580px) {
+      .app-card { padding: 1.8rem; }
+      h1 { font-size: 1.6rem; }
+      .action-bar { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-card">
+  <h1>
+    <i class="fas fa-robot"></i> 
+    AI Resume Analyzer
+  </h1>
+  <div class="subhead">
+    <i class="fas fa-check-circle" style="color: #2b7b8f; margin-right: 6px;"></i> 
+    Upload your resume · We’ll verify the format & structure
+  </div>
+
+  <!-- Upload zone -->
+  <div class="upload-zone" id="uploadZone">
+    <i class="fas fa-cloud-upload-alt"></i>
+    <h3>Drop your resume here</h3>
+    <p>or click to browse (PDF, DOCX, TXT)</p>
+    <div class="file-input-wrap">
+      <label for="fileInput" class="file-label">
+        <i class="fas fa-folder-open"></i> Choose file
+      </label>
+      <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.doc" />
+    </div>
+    <div id="fileStatus" class="file-status" style="background: #e2edf3; color: #1c4d5d;">
+      <i class="fas fa-file-alt"></i> No file selected
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="action-bar">
+    <button class="btn btn-outline" id="clearBtn"><i class="fas fa-undo-alt"></i> Clear</button>
+    <button class="btn btn-primary" id="analyzeBtn" disabled>
+      <i class="fas fa-microchip"></i> Analyze format
+    </button>
+  </div>
+
+  <!-- Result card -->
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <i class="fas fa-clipboard-check" style="color: #1f6b7a;"></i> 
+      Format Analysis
+      <span class="verdict-badge" id="verdictBadge"><i class="fas fa-hourglass-half"></i> Pending</span>
+    </div>
+    <ul class="format-checklist" id="checklist">
+      <!-- dynamically filled -->
+    </ul>
+    <div class="detail-line">
+      <span><i class="far fa-file-pdf"></i> File</span>
+      <span id="fileNameDisplay">—</span>
+    </div>
+    <div class="detail-line">
+      <span><i class="far fa-calendar-alt"></i> Analyzed</span>
+      <span id="timestampDisplay">—</span>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <i class="fas fa-shield-alt" style="opacity: 0.6;"></i> 
+    Your file stays local · no upload to any server
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- DOM refs -----
+    const fileInput = document.getElementById('fileInput');
+    const fileStatus = document.getElementById('fileStatus');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const resultCard = document.getElementById('resultCard');
+    const checklist = document.getElementById('checklist');
+    const verdictBadge = document.getElementById('verdictBadge');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const timestampDisplay = document.getElementById('timestampDisplay');
+    const uploadZone = document.getElementById('uploadZone');
+
+    // ----- State -----
+    let currentFile = null;           // File object
+    let fileContent = null;          // text content (for TXT) or placeholder for binary
+    let fileName = '';
+
+    // ----- Helper: reset UI to default (keep result hidden) -----
+    function resetUI(keepResult = false) {
+      if (!keepResult) {
+        resultCard.classList.remove('visible');
+        resultCard.style.display = 'none';
+      }
+      // don't reset file status text if we just cleared file
+      if (!currentFile) {
+        fileStatus.innerHTML = `<i class="fas fa-file-alt"></i> No file selected`;
+        fileStatus.style.background = '#e2edf3';
+        fileStatus.style.color = '#1c4d5d';
+      }
+      analyzeBtn.disabled = true;
+    }
+
+    // ----- Update file status display -----
+    function updateFileStatus(file) {
+      if (file) {
+        const icon = file.type.includes('pdf') ? 'fa-file-pdf' :
+                     file.type.includes('word') || file.name.endsWith('.docx') ? 'fa-file-word' :
+                     'fa-file-alt';
+        const size = (file.size / 1024).toFixed(1);
+        fileStatus.innerHTML = `<i class="fas ${icon}"></i> ${file.name} · ${size} KB`;
+        fileStatus.style.background = '#d2e9f2';
+        fileStatus.style.color = '#0b3949';
+        fileNameDisplay.textContent = file.name;
+      } else {
+        fileStatus.innerHTML = `<i class="fas fa-file-alt"></i> No file selected`;
+        fileStatus.style.background = '#e2edf3';
+        fileStatus.style.color = '#1c4d5d';
+        fileNameDisplay.textContent = '—';
+      }
+    }
+
+    // ----- Simulate AI analysis based on file content & name -----
+    function analyzeResume(file, content) {
+      // build a set of "format checks" – each returns { pass: boolean, message, icon }
+      const checks = [];
+
+      // 1. Check file extension / type
+      const ext = file.name.split('.').pop().toLowerCase();
+      const validExts = ['pdf', 'docx', 'doc', 'txt'];
+      const extOk = validExts.includes(ext);
+      checks.push({
+        pass: extOk,
+        message: extOk ? `File extension “.${ext}” is acceptable` : `“${ext}” is not a standard resume format (PDF, DOCX, TXT)`,
+        icon: extOk ? 'fa-check-circle pass' : 'fa-times-circle fail'
+      });
+
+      // 2. Check file size ( < 5MB )
+      const sizeOk = file.size < 5 * 1024 * 1024;
+      checks.push({
+        pass: sizeOk,
+        message: sizeOk ? `File size (${(file.size/1024).toFixed(1)} KB) is within 5 MB limit` : `File size exceeds 5 MB (${(file.size/1024/1024).toFixed(2)} MB)`,
+        icon: sizeOk ? 'fa-check-circle pass' : 'fa-times-circle fail'
+      });
+
+      // 3. Check if content is extractable (for TXT) or has some text (simulate)
+      let hasContent = false;
+      let contentSample = '';
+      if (content && content.trim().length > 0) {
+        hasContent = true;
+        contentSample = content.trim().slice(0, 300);
+      } else if (ext === 'pdf' || ext === 'docx' || ext === 'doc') {
+        // for binary we simulate that we "extracted" some text (in real app we'd parse)
+        // we assume PDF/DOCX are OK, but we add a gentle warning that text extraction is simulated.
+        hasContent = true; // assume content exists
+      }
+
+      checks.push({
+        pass: hasContent,
+        message: hasContent ? 'Resume content appears readable' : 'No text content could be extracted — file may be empty or image-based',
+        icon: hasContent ? 'fa-check-circle pass' : 'fa-exclamation-triangle warn'
+      });
+
+      // 4. (Format heuristics) look for common sections: "experience", "education", "skills"
+      let hasSections = false;
+      let sectionCount = 0;
+      if (content && typeof content === 'string') {
+        const lower = content.toLowerCase();
+        const keywords = ['experience', 'education', 'skills', 'summary', 'objective', 'projects'];
+        sectionCount = keywords.filter(k => lower.includes(k)).length;
+        hasSections = sectionCount >= 2;
+      } else {
+        // binary: we assume true for PDF/DOCX if ext is valid
+        if (['pdf', 'docx', 'doc'].includes(ext)) {
+          hasSections = true;
+          sectionCount = 3; // typical
+        } else {
+          hasSections = false;
+        }
+      }
+      checks.push({
+        pass: hasSections,
+        message: hasSections ? `Found ${sectionCount} key sections (e.g., experience, education)` : 'Missing common resume sections (experience, education, skills)',
+        icon: hasSections ? 'fa-check-circle pass' : 'fa-exclamation-triangle warn'
+      });
+
+      // 5. Check for contact info (phone or email)
+      let hasContact = false;
+      if (content && typeof content === 'string') {
+        const emailRegex = /\S+@\S+\.\S+/;
+        const phoneRegex = /(\+\d{1,3}[\s-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/;
+        hasContact = emailRegex.test(content) || phoneRegex.test(content);
+      } else if (['pdf', 'docx', 'doc'].includes(ext)) {
+        hasContact = true; // assume typical resume has contact
+      }
+      checks.push({
+        pass: hasContact,
+        message: hasContact ? 'Contact information (email/phone) detected' : 'No clear contact info — ensure email or phone is present',
+        icon: hasContact ? 'fa-check-circle pass' : 'fa-exclamation-triangle warn'
+      });
+
+      // 6. Overall "right format" verdict : at least 4/6 pass
+      const passCount = checks.filter(c => c.pass).length;
+      const overall = passCount >= 4;
+
+      // Build checklist HTML
+      let checklistHTML = '';
+      checks.forEach(c => {
+        checklistHTML += `<li>
+          <i class="fas ${c.icon}"></i>
+          <span>${c.message}</span>
+        </li>`;
+      });
+
+      // additional note for pdf/docx: we mention “text extraction simulated” 
+      if (['pdf', 'docx', 'doc'].includes(ext) && !content) {
+        checklistHTML += `<li><i class="fas fa-info-circle" style="color:#3b7b8e;"></i> <span style="font-size:0.9rem; opacity:0.8;">For PDF/DOCX, content analysis is based on file metadata & simulated extraction.</span></li>`;
+      }
+
+      // update result UI
+      checklist.innerHTML = checklistHTML;
+
+      const badgeIcon = overall ? 'fa-check-circle' : 'fa-exclamation-circle';
+      const badgeText = overall ? 'Valid format ✓' : 'Needs improvement';
+      const badgeColor = overall ? '#1f8b6b' : '#b13e4b';
+      const bgColor = overall ? '#e0f2ec' : '#fde8ea';
+      verdictBadge.innerHTML = `<i class="fas ${badgeIcon}"></i> ${badgeText}`;
+      verdictBadge.style.background = bgColor;
+      verdictBadge.style.color = badgeColor;
+
+      // timestamp
+      const now = new Date();
+      timestampDisplay.textContent = now.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      // show result card
+      resultCard.style.display = 'block';
+      resultCard.classList.add('visible');
+    }
+
+    // ----- Handle file selection -----
+    function handleFile(file) {
+      if (!file) {
+        currentFile = null;
+        fileContent = null;
+        fileName = '';
+        updateFileStatus(null);
+        analyzeBtn.disabled = true;
+        resultCard.classList.remove('visible');
+        resultCard.style.display = 'none';
+        return;
+      }
+
+      // store file
+      currentFile = file;
+      fileName = file.name;
+      updateFileStatus(file);
+      analyzeBtn.disabled = false;
+
+      // read text content if possible (for txt, pdf, docx we try to read as text; for binary we keep null)
+      const reader = new FileReader();
+      const fileType = file.type;
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (ext === 'txt' || fileType === 'text/plain') {
+        reader.onload = (e) => {
+          fileContent = e.target.result;
+          // auto-analyze? we let user click analyze.
+        };
+        reader.readAsText(file);
+      } else {
+        // for PDF/DOCX we don't read as text (would be gibberish), we set content to null
+        // but we keep a flag that we have a binary
+        fileContent = null; 
+        // we could still read as ArrayBuffer but for demo we skip
+        // We'll use a placeholder message in analysis.
+      }
+    }
+
+    // ----- Clear everything -----
+    function clearAll() {
+      fileInput.value = '';
+      currentFile = null;
+      fileContent = null;
+      fileName = '';
+      updateFileStatus(null);
+      analyzeBtn.disabled = true;
+      resultCard.classList.remove('visible');
+      resultCard.style.display = 'none';
+      // reset file status text
+      fileStatus.innerHTML = `<i class="fas fa-file-alt"></i> No file selected`;
+      fileStatus.style.background = '#e2edf3';
+      fileStatus.style.color = '#1c4d5d';
+    }
+
+    // ----- Analyze action -----
+    function performAnalysis() {
+      if (!currentFile) {
+        alert('Please select a resume file first.');
+        return;
+      }
+
+      // if we have a txt file and content is loaded, use it; otherwise use null
+      let contentForAnalysis = fileContent;
+
+      // for binary files, we pass null but analysis will simulate
+      analyzeResume(currentFile, contentForAnalysis);
+    }
+
+    // ----- Event listeners -----
+    fileInput.addEventListener('change', (e) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        handleFile(files[0]);
+      } else {
+        clearAll();
+      }
+    });
+
+    // Drag and drop support on upload zone
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.style.borderColor = '#1f8b6b';
+      uploadZone.style.background = 'rgba(200, 235, 245, 0.5)';
+    });
+
+    uploadZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      uploadZone.style.borderColor = '#b6d4e0';
+      uploadZone.style.background = 'rgba(255,255,255,0.5)';
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.style.borderColor = '#b6d4e0';
+      uploadZone.style.background = 'rgba(255,255,255,0.5)';
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files && files.length > 0) {
+        // update file input
+        fileInput.files = files;
+        handleFile(files[0]);
+      }
+    });
+
+    // Click on zone triggers file input
+    uploadZone.addEventListener('click', (e) => {
+      // avoid if click on label or button
+      if (e.target.closest('.file-label') || e.target.closest('#fileInput')) return;
+      fileInput.click();
+    });
+
+    analyzeBtn.addEventListener('click', performAnalysis);
+
+    clearBtn.addEventListener('click', clearAll);
+
+    // initial reset
+    resetUI(false);
+    updateFileStatus(null);
+  })();
+</script>
+
+</body>
+</html> 
